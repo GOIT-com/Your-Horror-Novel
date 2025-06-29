@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Stories collection - allow read/write for authenticated requests
+    // In a production environment, you might want to add authentication
+    match /stories/{storyId} {
+      allow read, write: if true;
+    }
+    
+    // Deny all other documents by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

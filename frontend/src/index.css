@@ -1,0 +1,141 @@
+:root {
+  --color-blood: #8B0000;
+  --color-dark-red: #4A0000;
+  --color-black: #000000;
+  --color-dark-grey: #1a1a1a;
+  --color-grey: #333333;
+  --color-light-grey: #666666;
+  --color-white: #ffffff;
+  --color-bone: #F5F5DC;
+  
+  --font-horror: 'Creepster', cursive;
+  --font-body: 'Crimson Text', serif;
+  
+  --shadow-dark: 0 4px 20px rgba(139, 0, 0, 0.3);
+  --shadow-glow: 0 0 15px rgba(139, 0, 0, 0.5);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background: linear-gradient(135deg, var(--color-black) 0%, var(--color-dark-grey) 100%);
+  color: var(--color-bone);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-dark-grey);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-blood);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-dark-red);
+}
+
+/* Horror text effects */
+.horror-title {
+  font-family: var(--font-horror);
+  color: var(--color-blood);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  filter: drop-shadow(0 0 10px var(--color-blood));
+}
+
+.horror-text {
+  font-family: var(--font-body);
+  color: var(--color-bone);
+  line-height: 1.6;
+}
+
+/* Button styles */
+.horror-button {
+  background: linear-gradient(145deg, var(--color-blood), var(--color-dark-red));
+  border: 2px solid var(--color-blood);
+  color: var(--color-bone);
+  padding: 12px 24px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-dark);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.horror-button:hover {
+  background: linear-gradient(145deg, var(--color-dark-red), var(--color-blood));
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+
+.horror-button:active {
+  transform: translateY(0);
+}
+
+/* Input styles */
+.horror-input {
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid var(--color-grey);
+  color: var(--color-bone);
+  padding: 12px 16px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  border-radius: 8px;
+  width: 100%;
+  transition: border-color 0.3s ease;
+}
+
+.horror-input:focus {
+  outline: none;
+  border-color: var(--color-blood);
+  box-shadow: 0 0 10px rgba(139, 0, 0, 0.3);
+}
+
+.horror-input::placeholder {
+  color: var(--color-light-grey);
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.loading {
+  animation: pulse 1.5s infinite;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .horror-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  
+  .horror-input {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+}
