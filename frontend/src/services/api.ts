@@ -1,8 +1,10 @@
 import axios from 'axios'
 import { QuizAnswers } from '../context/StoryContext'
 
-// 環境変数からAPIベースURLを取得、デフォルトはプロキシ経由
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/backend'
+// 本番環境ではVITE_API_BASE_URL環境変数、開発環境ではプロキシ経由
+const API_BASE_URL = import.meta.env.MODE === 'production'
+  ? (import.meta.env.VITE_API_BASE_URL || 'https://your-backend-url.run.app')
+  : (import.meta.env.VITE_API_BASE_URL || '/backend')
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -4,110 +4,239 @@ React + TypeScript + Vite で構築されたフロントエンドアプリケー
 
 ## 🚀 クイックスタート
 
+### 開発環境
+
 ```bash
-# 依存関係のインストール
+# 依存関係インストール
 npm install
 
 # 開発サーバー起動
-npm start
+npm run dev
 
-# または自動スクリプト
-./start-frontend.sh
+# アクセス: http://localhost:3000
 ```
 
-## 📦 利用可能なスクリプト
+### 本番ビルド
 
 ```bash
-npm start            # 開発サーバー起動
-npm run dev          # 開発サーバー起動（上記と同じ）
-npm run build        # 本番用ビルド
-npm run preview      # ビルド結果のプレビュー
-npm run lint         # ESLintでコードチェック
-npm run type-check   # TypeScriptの型チェック
+# 本番用ビルド
+npm run build:prod
+
+# プレビュー
+npm run preview
 ```
 
-## 🏗️ プロジェクト構造
+## 🔧 環境変数設定
+
+### 開発環境
+
+開発環境では、プロキシ設定により `/backend` パスがバックエンドサーバーに転送されます。
+
+```bash
+# .env.development (オプション)
+VITE_API_BASE_URL=/backend
+```
+
+### 本番環境
+
+```bash
+# .env.production
+VITE_API_BASE_URL=https://your-backend-url.run.app
+```
+
+または、`src/services/api.ts` で直接設定：
+
+```typescript
+const API_BASE_URL = import.meta.env.MODE === 'production'
+  ? 'https://your-backend-url.run.app'
+  : '/backend'
+```
+
+## 🛠 技術スタック
+
+- **React 18** - UIライブラリ
+- **TypeScript** - 型安全性
+- **Vite** - 高速ビルドツール
+- **Styled Components** - CSS-in-JS
+- **Axios** - HTTP クライアント
+- **React Router** - ルーティング
+
+## 📁 プロジェクト構造
 
 ```
 frontend/
 ├── src/
-│   ├── pages/           # ページコンポーネント
-│   │   ├── LandingPage.tsx
-│   │   ├── QuizPage.tsx
-│   │   ├── ChatPage.tsx
-│   │   └── CompletionPage.tsx
-│   ├── context/         # React Context
-│   │   └── StoryContext.tsx
-│   ├── services/        # API サービス
-│   │   └── api.ts
-│   ├── data/           # 静的データ
-│   │   └── quizQuestions.ts
-│   ├── App.tsx         # メインアプリコンポーネント
-│   ├── main.tsx        # エントリーポイント
-│   └── index.css       # グローバルスタイル
-├── package.json        # 依存関係とスクリプト
-├── vite.config.ts      # Vite設定
-├── tsconfig.json       # TypeScript設定
-└── index.html          # HTMLテンプレート
+│   ├── components/          # 再利用可能なUIコンポーネント
+│   │   └── FontSwitcher.tsx   # フォント切り替え
+│   ├── pages/               # ページコンポーネント
+│   │   ├── LandingPage.tsx     # ランディングページ
+│   │   ├── QuizPage.tsx        # クイズページ
+│   │   ├── ChatPage.tsx        # チャットページ
+│   │   └── CompletionPage.tsx  # 完了ページ
+│   ├── context/             # React Context
+│   │   ├── StoryContext.tsx    # ストーリー状態管理
+│   │   └── FontContext.tsx     # フォント状態管理
+│   ├── services/            # API クライアント
+│   │   └── api.ts              # バックエンドAPI
+│   ├── data/                # 静的データ
+│   │   └── quizQuestions.ts    # クイズ質問データ
+│   ├── App.tsx              # メインアプリケーション
+│   ├── main.tsx             # エントリーポイント
+│   ├── index.css            # グローバルスタイル
+│   └── vite-env.d.ts        # Vite型定義
+├── public/                  # 静的ファイル
+├── fonts/                   # フォントファイル
+├── index.html               # HTMLテンプレート
+├── package.json             # 依存関係
+├── vite.config.ts           # Vite設定
+└── tsconfig.json            # TypeScript設定
 ```
 
-## 🎨 使用技術
+## 🎨 UI/UXカスタマイズ
 
-- **React 18** - UIライブラリ
-- **TypeScript** - 型安全な開発
-- **Vite** - 高速ビルドツール
-- **React Router** - ルーティング
-- **Styled Components** - CSS-in-JS
-- **Axios** - HTTP クライアント
+### テーマカラーの変更
 
-## 🌐 バックエンド接続設定
+`src/index.css` のCSS変数を編集：
 
-### 環境変数での設定
+```css
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #1a1a1a;
+  --text-primary: #f0f0f0;
+  --accent-color: #8b0000;
+  --border-color: #333;
+}
+```
+
+### フォントの変更
+
+1. `public/fonts/` にフォントファイルを配置
+2. `src/index.css` でフォントを定義
+3. `src/context/FontContext.tsx` でフォント選択肢を更新
+
+### コンポーネントのスタイル変更
+
+各ページコンポーネント内のstyled-components を編集してカスタマイズできます。
+
+## 🔌 API統合
+
+### バックエンドとの連携
+
+`src/services/api.ts` でAPI呼び出しを管理：
+
+```typescript
+// ストーリー開始
+const response = await storyApi.startStory(quizAnswers)
+
+// チャットメッセージ送信
+const response = await storyApi.sendMessage(storyId, message)
+
+// ストーリー完了・PDF送信
+const response = await storyApi.finishStory(storyId, email)
+```
+
+### エラーハンドリング
+
+APIエラーは自動的にキャッチされ、ユーザーに適切なメッセージが表示されます。
+
+## 🚀 デプロイ
+
+### Firebase Hosting
+
+プロジェクトルートから：
 
 ```bash
-# 開発環境（デフォルト - プロキシ経由）
-VITE_API_BASE_URL=/backend
+# テンプレートからデプロイスクリプトをコピー
+cp deploy-frontend.sh.example deploy-frontend.sh
+chmod +x deploy-frontend.sh
 
-# ローカル直接接続
-VITE_API_BASE_URL=http://localhost:8000
+# Firebase プロジェクト設定
+firebase init hosting
 
-# 本番環境
-VITE_API_BASE_URL=https://your-backend-url.com
+# デプロイ実行
+./deploy-frontend.sh
 ```
 
-### 設定ファイル
-
-- `.env` - ローカル開発用（プロキシ経由）
-- `.env.local` - ローカル開発用（直接接続）
-- `.env.production` - 本番環境用
-
-### 設定変更方法
+### 手動デプロイ
 
 ```bash
-# 環境設定確認
-./check-frontend-env.sh
+# 本番用ビルド
+npm run build:prod
 
-# 設定ファイル編集
-vim .env
+# Firebase Hostingにデプロイ
+firebase deploy --only hosting
 ```
 
-## 🔧 開発ガイド
+### その他のホスティングサービス
 
-### 新しいページの追加
-1. `src/pages/` に新しいコンポーネントを作成
-2. `src/App.tsx` にルートを追加
+- **Vercel**: `dist/` ディレクトリを直接デプロイ
+- **Netlify**: `dist/` ディレクトリを直接デプロイ
+- **GitHub Pages**: `gh-pages` ブランチにデプロイ
 
-### APIサービスの追加
-1. `src/services/api.ts` に新しい関数を追加
-2. 必要に応じて型定義を追加
+## 🧪 開発とテスト
 
-### スタイルの変更
-- グローバルスタイル: `src/index.css`
-- CSS変数を活用してホラーテーマを維持
+### コード品質
 
-## 🎭 ホラーテーマ
+```bash
+# リンター実行
+npm run lint
 
-アプリケーションは以下のデザイン要素を使用：
-- **カラーパレット**: 黒、ダークレッド、ボーン色
-- **フォント**: Creepster (タイトル), Crimson Text (本文)
-- **エフェクト**: グロー、シャドウ、アニメーション
+# 型チェック
+npm run type-check
+```
+
+### ホットリロード
+
+開発サーバーはファイル変更を自動的に検知し、ブラウザをリロードします。
+
+### プロキシ設定
+
+`vite.config.ts` でバックエンドAPIへのプロキシを設定：
+
+```typescript
+server: {
+  proxy: {
+    '/backend': {
+      target: 'http://localhost:8000',
+      changeOrigin: true,
+      rewrite: (path) => path.replace(/^\/backend/, '')
+    }
+  }
+}
+```
+
+## 📱 レスポンシブデザイン
+
+- **モバイル**: 320px-767px
+- **タブレット**: 768px-1023px
+- **デスクトップ**: 1024px以上
+
+メディアクエリは `src/index.css` で定義されています。
+
+## ⚠️ 注意事項
+
+### フォントライセンス
+
+- `fonts/minamoji_1_4/` に含まれるフォントファイルは著作権保護されています
+- 商用利用の際は適切なライセンスを取得するか、代替フォントを使用してください
+
+### 環境変数
+
+- 機密情報を含む環境変数は `.env` ファイルに保存し、リポジトリにコミットしないでください
+- 本番環境では適切なシークレット管理サービスを使用してください
+
+## 🤝 コントリビューション
+
+1. 新しいページやコンポーネントを追加する際は、既存のコード スタイルに従ってください
+2. TypeScriptの型定義を適切に設定してください
+3. レスポンシブデザインを考慮してください
+4. アクセシビリティガイドラインに準拠してください
+
+## 📊 パフォーマンス最適化
+
+- Viteによる高速ビルド
+- コード分割による読み込み最適化
+- 画像の最適化
+- フォントの最適読み込み
+
+詳細なパフォーマンス改善については、Viteの公式ドキュメントを参照してください。
