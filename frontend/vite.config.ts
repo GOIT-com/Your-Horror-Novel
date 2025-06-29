@@ -12,5 +12,19 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/backend/, '')
       }
     }
+  },
+  assetsInclude: ['**/*.ttf', '**/*.otf', '**/*.woff', '**/*.woff2'],
+  build: {
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && /\.(ttf|otf|woff|woff2)$/.test(assetInfo.name)) {
+            return 'fonts/[name].[hash][extname]';
+          }
+          return 'assets/[name].[hash][extname]';
+        }
+      }
+    }
   }
 })

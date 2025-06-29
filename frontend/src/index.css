@@ -1,3 +1,15 @@
+/* minamoji_1_4フォントの定義 */
+@font-face {
+  font-family: 'MinamojiFont';
+  src: url('../fonts/minamoji_1_4/minamoji04.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Google Fonts（Creepster, Crimson Text）の読み込み */
+@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
 :root {
   --color-blood: #8B0000;
   --color-dark-red: #4A0000;
@@ -8,8 +20,12 @@
   --color-white: #ffffff;
   --color-bone: #F5F5DC;
   
-  --font-horror: 'Creepster', cursive;
-  --font-body: 'Crimson Text', serif;
+  /* 動的に変更されるフォント変数 */
+  --font-current: 'MinamojiFont', sans-serif;
+  
+  /* 固定フォント変数（フォールバック用） */
+  --font-horror: var(--font-current);
+  --font-body: var(--font-current);
   
   --shadow-dark: 0 4px 20px rgba(139, 0, 0, 0.3);
   --shadow-glow: 0 0 15px rgba(139, 0, 0, 0.5);

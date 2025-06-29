@@ -131,6 +131,10 @@ class EmailService:
                 .content {
                     line-height: 1.6;
                     margin-bottom: 20px;
+                    color: #FFFFFF;
+                }
+                .content p {
+                    color: #FFFFFF;
                 }
                 .highlight {
                     background: rgba(139, 0, 0, 0.2);
@@ -138,6 +142,7 @@ class EmailService:
                     border-radius: 8px;
                     border: 1px solid #8B0000;
                     margin: 20px 0;
+                    color: #FFFFFF;
                 }
                 .footer {
                     text-align: center;
@@ -155,6 +160,7 @@ class EmailService:
                     text-align: center;
                     margin: 20px 0;
                     font-weight: bold;
+                    color: #FFFFFF;
                 }
             </style>
         </head>
