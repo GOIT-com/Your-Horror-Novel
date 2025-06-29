@@ -26,3 +26,12 @@ dist-ssr
 # Environment variables
 */.env
 */service-account-key.json
+.specstory/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Font files (copyrighted)
+frontend/fonts/minamoji_1_4/

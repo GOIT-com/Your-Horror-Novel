@@ -8,13 +8,18 @@ RUN apt-get update && apt-get install -y \
     curl \
     fonts-dejavu \
     fonts-noto-cjk \
+    fontconfig \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# フォント用ディレクトリを作成
+RUN mkdir -p /usr/share/fonts/truetype/minamoji_1_4
 
+# 依存関係をインストール
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# アプリケーションファイルをコピー
 COPY . .
 
 EXPOSE 8080
