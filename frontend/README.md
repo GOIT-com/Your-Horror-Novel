@@ -1,4 +1,4 @@
-# 🎭 Frontend - Your Horror Nobel
+# 🎭 Frontend - Your Horror Novel
 
 React + TypeScript + Vite で構築されたフロントエンドアプリケーション
 
