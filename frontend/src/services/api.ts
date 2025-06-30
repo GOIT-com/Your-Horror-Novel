@@ -1,14 +1,17 @@
 import axios from 'axios'
 import { QuizAnswers } from '../context/StoryContext'
 
-// 環境変数からAPIベースURLを取得、デフォルトはプロキシ経由
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/backend'
+// 本番環境ではVITE_API_BASE_URL環境変数、開発環境ではプロキシ経由
+export const API_BASE_URL = import.meta.env.MODE === 'production'
+  ? (import.meta.env.VITE_API_BASE_URL || 'https://your-backend-url.run.app')
+  : (import.meta.env.VITE_API_BASE_URL || '/backend')
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  timeout: 120000 // 2分のタイムアウト（音声生成用）
 })
 
 export interface StartStoryResponse {
@@ -20,8 +23,45 @@ export interface ChatResponse {
   reply: string
 }
 
-export interface FinishStoryResponse {
+export interface CompleteStoryResponse {
   message: string
+  novel: string
+}
+
+export interface SendEmailResponse {
+  message: string
+}
+
+export interface TTSOptions {
+  voice?: string
+  speed?: number
+}
+
+export interface AudioChunkInfo {
+  chunk_id: number
+  length: number
+  preview: string
+}
+
+export interface AudioChunksResponse {
+  total_chunks: number
+  chunks_info: {
+    chunk_id: number
+    length: number
+    preview: string
+  }[]
+}
+
+export interface AudioGenerationResponse {
+  audioUrl: string
+  cached: boolean
+  message?: string
+}
+
+export interface AudioChunkResponse {
+  audioUrl: string
+  chunkId: number
+  cached: boolean
 }
 
 export const storyApi = {
@@ -35,9 +75,125 @@ export const storyApi = {
     return response.data
   },
 
-  finishStory: async (storyId: string, email: string): Promise<FinishStoryResponse> => {
-    const response = await api.post(`/stories/${storyId}/finish`, { email })
+  completeStory: async (storyId: string): Promise<CompleteStoryResponse> => {
+    const response = await api.post(`/stories/${storyId}/complete`)
     return response.data
+  },
+
+  sendEmail: async (storyId: string, email: string): Promise<SendEmailResponse> => {
+    const response = await api.post(`/stories/${storyId}/send-email`, { email })
+    return response.data
+  },
+
+  generateAudio: async (storyId: string, options: TTSOptions = {}): Promise<AudioGenerationResponse> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/stories/${storyId}/generate-audio`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(options),
+      });
+
+      if (!response.ok) {
+        // Handle error response appropriately
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Failed to generate audio';
+        
+        try {
+          if (contentType && contentType.includes('application/json')) {
+            const errorData = await response.json();
+            errorMessage = errorData.detail || errorData.message || errorMessage;
+          } else {
+            const errorText = await response.text();
+            errorMessage = errorText || errorMessage;
+          }
+        } catch (parseError) {
+          console.warn('Failed to parse error response:', parseError);
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      // Check content type to determine how to handle response
+      const contentType = response.headers.get('content-type');
+      console.log('Response content-type:', contentType);
+      
+      if (contentType && (contentType.includes('audio/') || contentType.includes('application/octet-stream'))) {
+        // If response is binary audio data, create Blob URL
+        console.log('Received binary audio data, creating Blob URL...');
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        return { audioUrl, cached: false };
+      } else {
+        // If response is JSON with URL
+        console.log('Received JSON response with URL...');
+        const audioData: AudioGenerationResponse = await response.json();
+        return audioData;
+      }
+    } catch (error) {
+      console.error('Audio generation failed:', error);
+      throw error;
+    }
+  },
+
+  getAudioChunksInfo: async (storyId: string): Promise<AudioChunksResponse> => {
+    const response = await api.get(`/stories/${storyId}/audio-chunks-info`)
+    return response.data
+  },
+
+  generateAudioChunk: async (storyId: string, chunkId: number, options: TTSOptions = {}): Promise<AudioChunkResponse> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/stories/${storyId}/generate-audio-chunk/${chunkId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(options),
+      });
+
+      if (!response.ok) {
+        // Handle error response appropriately
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Failed to generate audio chunk';
+        
+        try {
+          if (contentType && contentType.includes('application/json')) {
+            const errorData = await response.json();
+            errorMessage = errorData.detail || errorData.message || errorMessage;
+          } else {
+            const errorText = await response.text();
+            errorMessage = errorText || errorMessage;
+          }
+        } catch (parseError) {
+          console.warn('Failed to parse error response:', parseError);
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      // Check content type to determine how to handle response
+      const contentType = response.headers.get('content-type');
+      console.log('Response content-type:', contentType);
+      
+      if (contentType && (contentType.includes('audio/') || contentType.includes('application/octet-stream'))) {
+        // If response is binary audio data, create Blob URL
+        console.log('Received binary audio data, creating Blob URL...');
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        return { audioUrl, chunkId, cached: false };
+      } else {
+        // If response is JSON with URL
+        console.log('Received JSON response with URL...');
+        const chunkData: AudioChunkResponse = await response.json();
+        return chunkData;
+      }
+    } catch (error) {
+      console.error('Audio chunk generation failed:', error);
+      throw error;
+    }
   }
 }
 

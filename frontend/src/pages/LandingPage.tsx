@@ -157,7 +157,7 @@ function LandingPage() {
       <Title>Your Horror Nobel</Title>
       <Subtitle>あなたの選択が、恐怖を紡ぐ。AIと創る、あなただけの物語。</Subtitle>
       
-      <AgeRating>R15+ 恐怖表現注意</AgeRating>
+      <AgeRating>R13+ 恐怖表現注意</AgeRating>
       
       <Description>
         <DescriptionTitle>🎭 体験の流れ</DescriptionTitle>
@@ -169,14 +169,24 @@ function LandingPage() {
             <FeatureNumber>2.</FeatureNumber> AIがあなた専用のホラー小説の冒頭を生成
           </FeatureItem>
           <FeatureItem>
-            <FeatureNumber>3.</FeatureNumber> 10ターンの対話で物語を共同制作
+            <FeatureNumber>3.</FeatureNumber> 4ターンの対話で物語を共同制作
           </FeatureItem>
           <FeatureItem>
             <FeatureNumber>4.</FeatureNumber> 完成した小説をPDFでメール受信
           </FeatureItem>
         </FeatureList>
         
-        <DescriptionText>
+        <DescriptionTitle style={{marginTop: '2rem'}}>🎨 このアプリの楽しみ方</DescriptionTitle>
+        <DescriptionText style={{textAlign: 'left', background: 'rgba(139, 0, 0, 0.1)', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--color-dark-red)'}}>
+          <strong>あなたは単なる読み手ではありません。</strong><br /><br />
+          このアプリでは、<em>あなた自身がホラー小説の作者</em>となります。
+          想像力を重ね、恐怖を織りなす作者として、AIと共に物語を紡いでいくのです。<br /><br />
+          あなたの選択が、あなたの言葉が、あなたの想像が——<br />
+          <strong>物語の運命を左右していくのです。</strong><br /><br />
+          ＊イヤフォンをつけて、BGMを流し、没入感をお楽しみください。<br />
+        </DescriptionText>
+        
+        <DescriptionText style={{marginTop: '1.5rem'}}>
           これは一度きりの体験です。あなたのメールアドレスで作成できる小説は１つのみ。
           <br />
           <strong>パンドラの箱を開ける覚悟はありますか？</strong>
@@ -186,6 +196,7 @@ function LandingPage() {
       <StartButton onClick={handleStart}>
         物語を始める
       </StartButton>
+      <DescriptionTitle style={{marginTop: '2rem'}}></DescriptionTitle>
     </Container>
   )
 }

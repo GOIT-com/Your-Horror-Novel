@@ -33,7 +33,7 @@ const initialState: StoryState = {
   storyId: null,
   chatHistory: [],
   currentTurn: 0,
-  maxTurns: 10,
+  maxTurns: 4,
   isLoading: false,
   error: null
 }
