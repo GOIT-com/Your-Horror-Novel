@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# 設定（あなたの情報に変更してください）
+PROJECT_ID="your-gcp-project-id"          # あなたのGCPプロジェクトIDに変更
+SERVICE_NAME="horror-nobel-backend"        # 任意のサービス名に変更
+REGION="asia-northeast1"                   # 必要に応じてリージョンを変更
+IMAGE_NAME="gcr.io/${PROJECT_ID}/${SERVICE_NAME}"
+
+echo "🚀 Cloud Runへのデプロイを開始します..."
+
+# .envファイルから環境変数を読み込み
+if [ -f .env ]; then
+    echo "📝 .envファイルから環境変数を読み込み中..."
+    export $(grep -v '^#' .env | xargs)
+else
+    echo "⚠️  .envファイルが見つかりません。手動で環境変数を設定してください。"
+fi
+
+# プロジェクトを設定
+echo "📝 Google Cloudプロジェクトを設定中..."
+gcloud config set project $PROJECT_ID
+
+# 必要なAPIを有効化
+echo "🔧 必要なAPIを有効化中..."
+gcloud services enable cloudbuild.googleapis.com
+gcloud services enable run.googleapis.com
+gcloud services enable containerregistry.googleapis.com
+
+# Cloud Buildを使用してビルド・デプロイ
+echo "🏗️ Cloud Buildでビルド・デプロイ中..."
+echo "注意: このスクリプトはプロジェクトルートから実行してください"
+
+# Cloud Buildを実行（backend/cloudbuild.yamlを使用）
+gcloud builds submit --config backend/cloudbuild.yaml \
+    --substitutions _SERVICE_NAME=$SERVICE_NAME \
+    --timeout 3600s .
+
+echo "✅ デプロイが完了しました！"
+
+# サービスのURLを取得して表示
+SERVICE_URL=$(gcloud run services describe $SERVICE_NAME --region=$REGION --format="value(status.url)")
+echo "🌐 サービスURL: $SERVICE_URL"
+
+# 環境変数設定の確認
+echo ""
+echo "📋 重要: 以下の環境変数がCloud Runサービスに設定されていることを確認してください："
+echo "  - GEMINI_API_KEY"
+echo "  - OPENAI_API_KEY (TTS機能用)"
+echo "  - GOOGLE_CLOUD_PROJECT"
+echo "  - SMTP_* または SENDGRID_* (メール送信用)"
+echo ""
+echo "環境変数の設定は Google Cloud Console の Cloud Run セクションで確認・編集できます。"

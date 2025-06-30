@@ -2,31 +2,64 @@
 
 echo "🔧 環境変数を設定しています..."
 
-# Gemini APIキーを設定してください（https://aistudio.google.com/app/apikey から取得）
-read -p "Gemini APIキーを入力してください: " -s GEMINI_API_KEY
-echo
+# .envファイルが存在しない場合は作成
+if [ ! -f .env ]; then
+    echo "📝 .envファイルを作成しています..."
+    cat > .env << 'EOF'
+# 必須 - Gemini AI API Key (https://aistudio.google.com/app/apikey から取得)
+GEMINI_API_KEY=your_gemini_api_key_here
 
-if [ -z "$GEMINI_API_KEY" ]; then
-    echo "❌ Gemini APIキーが入力されていません。"
-    exit 1
-fi
+# Google Cloud Project ID
+GOOGLE_CLOUD_PROJECT=your-gcp-project-id
 
-echo "✅ Gemini APIキーが設定されました。"
+# OpenAI API Key - TTS機能用 (https://platform.openai.com/api-keys から取得)
+OPENAI_API_KEY=your_openai_api_key_here
 
-# OpenAI APIキーを設定してください（https://platform.openai.com/api-keys から取得）
-read -p "OpenAI APIキー（TTS機能用）を入力してください: " -s OPENAI_API_KEY
-echo
+# メール送信設定（SMTP使用の場合）
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your_email@gmail.com
+SMTP_PASSWORD=your_16_character_app_password
+FROM_EMAIL=your_email@gmail.com
+EMAIL_SERVICE=smtp
 
-if [ -z "$OPENAI_API_KEY" ]; then
-    echo "❌ OpenAI APIキーが入力されていません。TTS機能は無効になります。"
-    echo "⚠️  音声朗読機能を使用したい場合は、OpenAI APIキーを設定してください。"
+# SendGrid使用の場合（オプション）
+# SENDGRID_API_KEY=your_sendgrid_api_key_here
+# EMAIL_SERVICE=sendgrid
+
+# その他
+DEV_MODE=true
+EOF
+    echo "✅ .envファイルのテンプレートを作成しました。"
+    echo "📝 .envファイルを編集して、必要なAPIキーを設定してください。"
+    echo ""
+    echo "必要なAPIキー："
+    echo "  1. Gemini API Key: https://aistudio.google.com/app/apikey"
+    echo "  2. OpenAI API Key: https://platform.openai.com/api-keys"
+    echo "  3. Gmail App Password: https://myaccount.google.com/apppasswords"
+    echo ""
 else
-    echo "✅ OpenAI APIキーが設定されました。"
+    echo "✅ .envファイルが見つかりました。"
 fi
 
-# 環境変数をエクスポート
-export GEMINI_API_KEY="$GEMINI_API_KEY"
-export OPENAI_API_KEY="$OPENAI_API_KEY"
+# 環境変数を読み込み
+if [ -f .env ]; then
+    echo "📝 .envファイルから環境変数を読み込んでいます..."
+    export $(grep -v '^#' .env | grep -v '^$' | xargs)
+fi
 
-echo "🚀 デプロイを開始します..."
-./deploy.sh 
+# 必須APIキーのチェック
+if [ -z "$GEMINI_API_KEY" ] || [ "$GEMINI_API_KEY" = "your_gemini_api_key_here" ]; then
+    echo "⚠️  Gemini APIキーが設定されていません。"
+    echo "    https://aistudio.google.com/app/apikey で取得し、.envファイルに設定してください。"
+fi
+
+if [ -z "$OPENAI_API_KEY" ] || [ "$OPENAI_API_KEY" = "your_openai_api_key_here" ]; then
+    echo "⚠️  OpenAI APIキーが設定されていません。"
+    echo "    TTS（音声読み上げ）機能を使用する場合は、"
+    echo "    https://platform.openai.com/api-keys で取得し、.envファイルに設定してください。"
+fi
+
+echo "🚀 環境設定を確認してください。"
+echo "   必要に応じて .env ファイルを編集した後、サーバーを起動してください："
+echo "   uvicorn main:app --reload --port 8000" 
