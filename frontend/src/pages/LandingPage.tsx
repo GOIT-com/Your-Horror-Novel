@@ -182,7 +182,8 @@ function LandingPage() {
           このアプリでは、<em>あなた自身がホラー小説の作者</em>となります。
           想像力を重ね、恐怖を織りなす作者として、AIと共に物語を紡いでいくのです。<br /><br />
           あなたの選択が、あなたの言葉が、あなたの想像が——<br />
-          <strong>物語の運命を左右していくのです。</strong>
+          <strong>物語の運命を左右していくのです。</strong><br /><br />
+          ＊イヤフォンをつけて、BGMを流し、没入感をお楽しみください。<br />
         </DescriptionText>
         
         <DescriptionText style={{marginTop: '1.5rem'}}>

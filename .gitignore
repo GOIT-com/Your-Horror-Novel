@@ -93,3 +93,4 @@ DEPLOY_README.md
 # Build outputs
 frontend/dist/
 backend/dist/
+audio/

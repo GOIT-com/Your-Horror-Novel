@@ -13,8 +13,20 @@ fi
 
 echo "✅ Gemini APIキーが設定されました。"
 
+# OpenAI APIキーを設定してください（https://platform.openai.com/api-keys から取得）
+read -p "OpenAI APIキー（TTS機能用）を入力してください: " -s OPENAI_API_KEY
+echo
+
+if [ -z "$OPENAI_API_KEY" ]; then
+    echo "❌ OpenAI APIキーが入力されていません。TTS機能は無効になります。"
+    echo "⚠️  音声朗読機能を使用したい場合は、OpenAI APIキーを設定してください。"
+else
+    echo "✅ OpenAI APIキーが設定されました。"
+fi
+
 # 環境変数をエクスポート
 export GEMINI_API_KEY="$GEMINI_API_KEY"
+export OPENAI_API_KEY="$OPENAI_API_KEY"
 
 echo "🚀 デプロイを開始します..."
 ./deploy.sh 

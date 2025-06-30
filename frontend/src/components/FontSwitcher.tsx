@@ -18,6 +18,7 @@ const FontSwitcherContainer = styled.div`
 `
 
 const HamburgerButton = styled.button`
+  display: none;
   background: rgba(139, 0, 0, 0.9);
   border: 2px solid var(--color-blood);
   color: var(--color-bone);
@@ -36,6 +37,10 @@ const HamburgerButton = styled.button`
   
   @media (max-width: 768px) {
     display: block;
+  }
+  
+  @media (min-width: 769px) {
+    display: none !important;
   }
 `
 
