@@ -16,11 +16,20 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir -p /usr/share/fonts/truetype/minamoji_1_4
 
 # 依存関係をインストール
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# フォントファイルをコピー（プロジェクトルートからのパス）
+COPY frontend/fonts/minamoji_1_4/*.ttf /usr/share/fonts/truetype/minamoji_1_4/
+
+# 背景画像をコピー
+COPY pdf用紙.png .
+
+# フォントキャッシュを更新
+RUN fc-cache -fv
+
 # アプリケーションファイルをコピー
-COPY . .
+COPY backend/ .
 
 EXPOSE 8080
 
