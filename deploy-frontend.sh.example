@@ -1,0 +1,32 @@
+#!/bin/bash
+
+echo "🚀 Firebase Hostingへのデプロイを開始します..."
+
+# フロントエンドディレクトリに移動
+cd frontend
+
+# 依存関係をインストール
+echo "📦 依存関係をインストール中..."
+npm install
+
+# 本番用ビルド
+echo "🏗️ 本番用ビルドを実行中..."
+npm run build:prod
+
+# ビルドが成功したかチェック
+if [ ! -d "dist" ]; then
+    echo "❌ ビルドに失敗しました。distディレクトリが作成されていません。"
+    exit 1
+fi
+
+echo "✅ ビルドが完了しました。"
+
+# プロジェクトルートに戻る
+cd ..
+
+# Firebase Hostingにデプロイ
+echo "🌐 Firebase Hostingにデプロイ中..."
+firebase deploy --only hosting
+
+echo "✅ Firebase Hostingへのデプロイが完了しました！"
+echo "🌐 サイトURL: https://your-project-id.web.app"

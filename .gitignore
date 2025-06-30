@@ -23,6 +23,73 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment variables
+# Environment variables and secrets
+.env
+.env.local
+.env.production
+.env.development
 */.env
+*/.env.local
+*/.env.production
+*/.env.development
+
+# Service account keys and credentials
+service-account-key.json
 */service-account-key.json
+credentials.json
+*/credentials.json
+
+# Deploy scripts with personal information
+deploy.sh
+deploy-frontend.sh
+*/deploy.sh
+*/deploy-frontend.sh
+
+# Firebase
+.firebase/
+firebase-debug.log
+.firebaserc
+
+# Specstory
+.specstory/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Docker
+.dockerignore
+
+# Font files (copyrighted)
+frontend/fonts/minamoji_1_4/
+
+# Personal deployment configurations
+DEPLOY_README.md
+*/DEPLOY_README.md
+
+# Build outputs
+frontend/dist/
+backend/dist/

@@ -8,10 +8,14 @@ services:
       - "8080:8080"
     volumes:
       - .:/app
+      # minamoji_1_4フォントをマウント
+      - ../frontend/fonts/minamoji_1_4:/usr/share/fonts/truetype/minamoji_1_4
+      # PDF用紙をマウント（PNG版 - 画像ベースPDF生成用）
+      - ../pdf用紙.png:/app/pdf用紙.png
     env_file:
       - .env
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=service-account-key.json
       - GOOGLE_CLOUD_PROJECT=your-horror-nobel
-    # 開発環境用: --reloadフラグ付きでホットリロード有効
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+    # 開発環境用: フォントキャッシュ更新後にサーバー起動
+    command: ["sh", "-c", "fc-cache -fv && uvicorn main:app --host 0.0.0.0 --port 8080 --reload"]
