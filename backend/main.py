@@ -131,6 +131,14 @@ async def complete_story(story_id: str):
         if not story:
             raise HTTPException(status_code=404, detail="Story not found")
         
+        # Check if story is already completed
+        if story.get("status") == "completed" and story.get("novel"):
+            logger.info(f"Story {story_id} already completed, returning existing novel")
+            return {
+                "message": "Story already completed",
+                "novel": story.get("novel")
+            }
+        
         # Generate final story text
         final_story = await gemini_service.generate_final_story(
             story.get("quizAnswers", {}),

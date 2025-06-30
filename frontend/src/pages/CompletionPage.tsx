@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { useStory } from '../context/StoryContext'
@@ -272,6 +272,9 @@ function CompletionPage() {
   const [error, setError] = useState('')
   const { storyId } = useParams<{ storyId: string }>()
   const { state } = useStory()
+  
+  // 重複実行を防ぐためのref
+  const isCompleting = useRef(false)
 
   // Function to clean markdown formatting from text
   const cleanMarkdownText = (text: string): string => {
@@ -291,7 +294,10 @@ function CompletionPage() {
 
   useEffect(() => {
     const completeStory = async () => {
-      if (!storyId) return
+      if (!storyId || isCompleting.current) return
+      
+      // 重複実行を防ぐフラグを設定
+      isCompleting.current = true
       
       try {
         setIsLoading(true)
@@ -304,10 +310,17 @@ function CompletionPage() {
         setError('物語の生成に失敗しました。')
       } finally {
         setIsLoading(false)
+        // 処理完了後もフラグは維持（同じstoryIdでの再実行を防ぐため）
       }
     }
 
     completeStory()
+    
+    // クリーンアップ関数（コンポーネントのアンマウント時）
+    return () => {
+      // コンポーネントがアンマウントされる場合のみフラグをリセット
+      // 通常の再レンダリングではリセットしない
+    }
   }, [storyId])
 
   const handleSubmit = async (e: React.FormEvent) => {
