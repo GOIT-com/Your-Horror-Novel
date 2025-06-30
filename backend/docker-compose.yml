@@ -3,7 +3,9 @@ name: your-horror-nobel-backend
 services:
   backend:
     container_name: your-horror-nobel-backend-container
-    build: .
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
     ports:
       - "8080:8080"
     volumes:

@@ -17,7 +17,8 @@ RUN mkdir -p /usr/share/fonts/truetype/minamoji_1_4
 
 # 依存関係をインストール
 COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir --upgrade -r requirements.txt
 
 # フォントファイルをコピー（プロジェクトルートからのパス）
 COPY frontend/fonts/minamoji_1_4/*.ttf /usr/share/fonts/truetype/minamoji_1_4/

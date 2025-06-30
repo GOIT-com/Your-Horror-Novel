@@ -1,255 +1,242 @@
-# 🎭 Your Horror Nobel - AI共作ホラーノベル
+# 🎭 Your Horror Nobel
 
-ユーザー参加型のインタラクティブなホラー小説生成Webアプリケーション。ユーザーの好みを診断し、AIと対話しながら10ターンでオリジナルのホラー小説を共作します。
+インタラクティブなホラー小説生成アプリケーション
 
-## 🌟 特徴
+クイズに答えることで、あなた好みの恐怖を分析し、AI（Gemini）が生成するオリジナルホラー小説をチャット形式で体験できます。完成した小説はPDFとして作成され、メールで送信されます。さらに、OpenAI TTSを使用した音声読み上げ機能で、ホラー小説を迫力ある音声で楽しむことができます。
 
-- **パーソナライズされた恐怖診断**: 10の質問でユーザーの恐怖の好みを分析
-- **AI共同創作**: Gemini AIとの対話で物語を進行
-- **ユニークな体験**: 一人一つのメールアドレスで一度だけの体験
-- **美しいホラーデザイン**: ダークテーマとホラー要素を組み合わせたUI
-- **PDF配信**: 完成した小説をメールでPDF配信
+## ✨ 特徴
 
-## 🏗️ アーキテクチャ
+- **パーソナライズ**: 10問のクイズでユーザーの恐怖の嗜好を分析
+- **AI生成**: Google Gemini APIを活用したインタラクティブなストーリー生成
+- **チャット体験**: リアルタイムでAIと対話しながら物語が展開
+- **音声読み上げ**: OpenAI TTSによる迫力あるホラー音声体験
+- **PDF生成**: 完成した小説を美しいPDFとして作成
+- **メール配信**: 完成作品をメールで受け取り可能
+- **レスポンシブ**: モバイル・タブレット・PC対応
 
-```
-[React Frontend] ←→ [FastAPI Backend] ←→ [Gemini AI]
-                            ↓
-                     [Cloud Firestore]
-                            ↓
-                    [PDF生成 & メール送信]
-```
+## 🛠 技術スタック
 
-## 🚀 セットアップ
+### フロントエンド
+- **React 18** - UIライブラリ
+- **TypeScript** - 型安全性
+- **Vite** - 高速ビルドツール
+- **Styled Components** - CSS-in-JS
+- **Axios** - HTTP クライアント
+
+### バックエンド
+- **FastAPI** - Python Web フレームワーク
+- **Google Gemini AI** - ストーリー生成
+- **OpenAI TTS** - 音声読み上げ
+- **Google Cloud Firestore** - NoSQL データベース
+- **FPDF2** - PDF生成
+- **SMTP/SendGrid** - メール送信
+
+### インフラ・デプロイ
+- **Firebase Hosting** - フロントエンドホスティング
+- **Google Cloud Run** - バックエンドコンテナ実行
+- **Docker** - コンテナ化
+- **Google Cloud Build** - CI/CD
+
+## 🚀 クイックスタート
 
 ### 前提条件
 
-- Node.js 18+
+- Node.js 16+
 - Python 3.11+
-- Google Cloud Project (`your-horror-nobel`)
-- Gemini API Key
-- SendGrid API Key
+- Docker
+- Google Cloud アカウント
+- Firebase プロジェクト
 
-### 1. プロジェクトのクローン
+### 1. リポジトリのクローン
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/your-username/Your-Horror-Nobel.git
 cd Your-Horror-Nobel
 ```
 
-### 2. バックエンドのセットアップ
+### 2. フロントエンド設定
 
 ```bash
-cd backend
-
-
-  1. 環境変数ファイル作成
-  vim backend/.env  
-
-  2. 必要なAPIキー設定
-  # backend/.env ファイル内で設定
-  GEMINI_API_KEY=your_actual_gemini_api_key
-  SENDGRID_API_KEY=your_actual_sendgrid_api_key
-  FROM_EMAIL=your_verified_email@domain.com
-  GOOGLE_CLOUD_PROJECT=your-horror-nobel
-
-  3. Google Cloud サービスアカウントキー
-  - Google Cloud Console でサービスアカウント作成
-  - JSONキーをダウンロード
-  - backend/service-account-key.json として保存
-### 3. Google Cloud Firestore の設定
-
-```bash
-# Google Cloud SDK をインストール
-# https://cloud.google.com/sdk/docs/install
-
-# 認証
-gcloud auth login
-gcloud config set project your-horror-nobel
-
-# Firestore を有効化
-gcloud firestore databases create --region=asia-northeast1
-
-# サービスアカウントキーの作成
-gcloud iam service-accounts create horror-nobel-service \\
-    --display-name="Horror Nobel Service Account"
-
-gcloud projects add-iam-policy-binding your-horror-nobel \\
-    --member="serviceAccount:horror-nobel-service@your-horror-nobel.iam.gserviceaccount.com" \\
-    --role="roles/datastore.user"
-
-gcloud iam service-accounts keys create service-account-key.json \\
-    --iam-account=horror-nobel-service@your-horror-nobel.iam.gserviceaccount.com
-```
-
-### 4. フロントエンドのセットアップ
-
-```bash
-cd ..  # プロジェクトルートに戻る
-
-# 依存関係のインストール
-npm install
-```
-
-### 5. 開発サーバーの起動
-
-#### 🚀 簡単起動（推奨）
-
-```bash
-# プロジェクトルートで
-./start-app.sh
-```
-
-#### 📋 手動起動
-
-```bash
-# ターミナル1: バックエンド（Docker）
-cd backend
-./start-backend.sh
-
-# ターミナル2: フロントエンド（Node.js）
 cd frontend
-./start-frontend.sh
+npm install
+npm run dev
 ```
 
-#### 🌐 アクセスURL
-- **フロントエンド**: http://localhost:3000
-- **バックエンドAPI**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
-
-## 🐳 Docker での実行
+### 3. バックエンド設定
 
 ```bash
-# 環境変数を設定
-cp backend/.env.example backend/.env
-# .envファイルを編集
-
-# Docker Compose で起動
-docker-compose up --build
-```
-
-## 📦 本番デプロイ
-
-### Cloud Run へのデプロイ
-
-```bash
-# Cloud Build の設定
-gcloud builds submit --config=deploy/cloudbuild.yaml
-
-# または手動デプロイ
 cd backend
-gcloud run deploy your-horror-nobel-backend \\
-    --source . \\
-    --region asia-northeast1 \\
-    --allow-unauthenticated \\
-    --set-env-vars GOOGLE_CLOUD_PROJECT=your-horror-nobel
+
+# 環境変数設定（対話式）
+./setup_env.sh
+
+# または手動で設定
+cp .env.example .env
+# .envファイルを編集してAPIキーを設定
+
+# 仮想環境作成
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# 依存関係インストール
+pip install -r requirements.txt
+
+# サーバー起動
+uvicorn main:app --reload --port 8000
 ```
 
-### Firebase Hosting へのフロントエンドデプロイ
+### 4. 必要なAPIキーの取得
+
+1. **Gemini API**: [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. **OpenAI API**: [OpenAI Platform](https://platform.openai.com/api-keys) ※TTS機能用
+3. **Google Cloud**: [Google Cloud Console](https://console.cloud.google.com/)
+4. **Gmail App Password**: [Google Account Settings](https://myaccount.google.com/apppasswords)
+
+## 📋 設定方法
+
+### バックエンド環境変数 (.env)
 
 ```bash
-# Firebase CLI のインストール
-npm install -g firebase-tools
+# 必須
+GEMINI_API_KEY=your_gemini_api_key
+GOOGLE_CLOUD_PROJECT=your_project_id
 
-# Firebase プロジェクトの初期化
-firebase login
-firebase init hosting
+# TTS機能（音声読み上げ）
+OPENAI_API_KEY=your_openai_api_key
 
-# ビルドとデプロイ
-npm run build
-firebase deploy
+# メール設定（Gmail SMTPの場合）
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+FROM_EMAIL=your_email@gmail.com
+EMAIL_SERVICE=smtp
+
+# オプション
+DEV_MODE=true
 ```
+
+### フロントエンド環境変数
+
+```bash
+# 本番環境のみ
+VITE_API_BASE_URL=https://your-backend-url.run.app
+```
+
+## 🌐 デプロイ
+
+### フロントエンド（Firebase Hosting）
+
+```bash
+# テンプレートからコピー
+cp deploy-frontend.sh.example deploy-frontend.sh
+chmod +x deploy-frontend.sh
+
+# スクリプト内のプロジェクトIDを編集
+# デプロイ実行
+./deploy-frontend.sh
+```
+
+### バックエンド（Google Cloud Run）
+
+```bash
+cd backend
+
+# テンプレートからコピー
+cp deploy.sh.example deploy.sh
+chmod +x deploy.sh
+
+# deploy.shを編集してプロジェクト情報を設定
+# デプロイ実行
+./deploy.sh
+```
+
+詳細な設定方法は各ディレクトリのREADME.mdを参照してください。
 
 ## 📁 プロジェクト構造
 
 ```
 Your-Horror-Nobel/
-├── frontend/              # React フロントエンド
+├── frontend/                    # フロントエンド (React + TypeScript)
 │   ├── src/
-│   │   ├── pages/         # ページコンポーネント
-│   │   ├── context/       # React Context
-│   │   ├── services/      # API サービス
-│   │   └── data/          # 静的データ
-│   ├── package.json       # フロントエンド依存関係
-│   └── start-frontend.sh  # フロントエンド起動スクリプト
-├── backend/               # FastAPI バックエンド
-│   ├── services/          # ビジネスロジック
-│   ├── main.py           # FastAPI アプリケーション
-│   ├── requirements.txt   # Python 依存関係
-│   ├── docker-compose.yml # バックエンド用Docker設定
-│   └── start-backend.sh   # バックエンド起動スクリプト
-├── deploy/               # デプロイ設定
-└── start-app.sh          # 全体起動ガイド
+│   │   ├── components/         # UIコンポーネント
+│   │   ├── pages/             # ページコンポーネント
+│   │   ├── context/           # React Context
+│   │   ├── services/          # API クライアント
+│   │   └── data/              # 静的データ
+│   ├── public/                # 静的ファイル
+│   └── README.md              # フロントエンド設定ガイド
+├── backend/                    # バックエンド (FastAPI + Python)
+│   ├── services/              # ビジネスロジック
+│   │   ├── gemini_service.py  # AI生成処理
+│   │   ├── tts_service.py     # 音声読み上げ
+│   │   ├── pdf_service.py     # PDF生成
+│   │   ├── email_service.py   # メール送信
+│   │   └── firestore_service.py # データベース
+│   ├── main.py                # FastAPI アプリケーション
+│   ├── requirements.txt       # Python 依存関係
+│   ├── Dockerfile            # Docker 設定
+│   └── README.md             # バックエンド設定ガイド
+├── firebase.json              # Firebase 設定
+├── firestore.rules           # Firestore セキュリティルール
+├── .env.example              # 環境変数テンプレート
+└── README.md                 # プロジェクト概要
 ```
 
-## 🎮 使用方法
+## 🎵 新機能: 音声読み上げ (TTS)
 
-1. **トップページ**: アプリの紹介とR15+警告
-2. **診断クイズ**: 10の質問で恐怖の好みを診断
-3. **物語共作**: AIと10ターンの対話で物語を作成
-4. **完成・配信**: メールアドレスを入力してPDF受信
+OpenAI TTSを使用したホラー小説の音声読み上げ機能：
 
-## 🔧 開発
+- **ホラー最適化**: 深く不気味な声での読み上げ
+- **チャンク分割**: 長文を適切に分割して高品質な音声生成
+- **音声キャッシュ**: 生成済み音声の効率的な管理
+- **ダウンロード対応**: 生成された音声ファイルのダウンロード
 
-### コードフォーマット
+### TTS API エンドポイント
 
 ```bash
-# Python (バックエンド)
-cd backend
-black .
-flake8 .
+# 全文音声生成
+POST /stories/{story_id}/generate-audio
 
-# TypeScript/React (フロントエンド)
-npm run lint
-npm run type-check
+# チャンク別音声生成
+POST /stories/{story_id}/generate-audio-chunk/{chunk_id}
+
+# 音声情報取得
+GET /stories/{story_id}/audio-chunks-info
 ```
 
-### テスト
+## 🔧 カスタマイズ
 
-```bash
-# バックエンドテスト
-cd backend
-pytest
+### クイズ質問の変更
 
-# フロントエンドテスト
-npm test
-```
+`frontend/src/data/quizQuestions.ts` でクイズの内容をカスタマイズできます。
 
-## 📊 監視とログ
+### AIプロンプトの調整
 
-- Google Cloud Logging でアプリケーションログを確認
-- Cloud Monitoring でメトリクスを監視
-- Firestore コンソールでデータを確認
+`backend/services/gemini_service.py` でストーリー生成プロンプトを調整できます。
 
-## 🔐 セキュリティ
+### TTS音声の調整
 
-- HTTPS通信の暗号化
-- Firestore セキュリティルール
-- メールアドレス重複チェック
-- 入力値の検証とサニタイズ
+`backend/services/tts_service.py` で音声設定（声質、速度、ホラー特化指示など）をカスタマイズできます。
 
-## ⚠️ 注意事項
+### UI/UXデザイン
 
-- 一つのメールアドレスで作成できる小説は1つのみ
-- R15+相当のホラーコンテンツを含む
-- AIが生成するコンテンツの品質は完全に保証されない
+`frontend/src/components/` と `frontend/src/index.css` でデザインをカスタマイズできます。
 
 ## 🤝 コントリビューション
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. このリポジトリをフォーク
+2. フィーチャーブランチを作成 (`git checkout -b feature/amazing-feature`)
+3. 変更をコミット (`git commit -m 'Add amazing feature'`)
+4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
+5. プルリクエストを作成
 
-## 📝 ライセンス
+## 📜 ライセンス
 
-このプロジェクトは MIT ライセンスの下で公開されています。
+このプロジェクトは MIT ライセンスの下で公開されています。詳細は [LICENSE](LICENSE) ファイルを参照してください。
 
-## 📞 サポート
+## ⚠️ 注意事項
 
-問題や質問がある場合は、GitHub Issues でお気軽にお知らせください。
-
----
-
-🎭 **恐怖の扉を開く準備はできていますか？**
+- 本アプリケーションはデモンストレーション目的で作成されています
+- APIキーなどの機密情報は適切に管理してください
+- OpenAI TTS機能を使用する場合は、OpenAI APIの利用料金が発生します
