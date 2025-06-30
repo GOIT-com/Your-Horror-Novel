@@ -195,6 +195,7 @@ function LandingPage() {
       <StartButton onClick={handleStart}>
         物語を始める
       </StartButton>
+      <DescriptionTitle style={{marginTop: '2rem'}}></DescriptionTitle>
     </Container>
   )
 }
