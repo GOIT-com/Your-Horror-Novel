@@ -122,14 +122,49 @@ async def send_chat_message(story_id: str, chat_data: ChatMessage):
         logger.error(f"Error processing chat message: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to process message")
 
-@app.post("/stories/{story_id}/finish")
-async def finish_story(story_id: str, finish_data: FinishStory):
-    """Finish story and send PDF via email"""
+@app.post("/stories/{story_id}/complete")
+async def complete_story(story_id: str):
+    """Complete story and generate final novel text"""
     try:
         # Get story from Firestore  
         story = await firestore_service.get_story(story_id)
         if not story:
             raise HTTPException(status_code=404, detail="Story not found")
+        
+        # Generate final story text
+        final_story = await gemini_service.generate_final_story(
+            story.get("quizAnswers", {}),
+            story.get("chatHistory", [])
+        )
+        
+        # Update story in Firestore with completed novel
+        await firestore_service.update_story(story_id, {
+            "novel": final_story,
+            "status": "completed",
+            "updatedAt": datetime.now()
+        })
+        
+        return {
+            "message": "Story completed successfully",
+            "novel": final_story
+        }
+    
+    except Exception as e:
+        logger.error(f"Error completing story: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to complete story")
+
+@app.post("/stories/{story_id}/send-email")
+async def send_story_email(story_id: str, finish_data: FinishStory):
+    """Send completed story as PDF via email"""
+    try:
+        # Get story from Firestore  
+        story = await firestore_service.get_story(story_id)
+        if not story:
+            raise HTTPException(status_code=404, detail="Story not found")
+        
+        # Check if story is completed
+        if story.get("status") != "completed" or not story.get("novel"):
+            raise HTTPException(status_code=400, detail="Story is not completed yet")
         
         # Check if email has already been used (skip in development mode)
         dev_mode = os.getenv("DEV_MODE", "false").lower() == "true"
@@ -139,23 +174,16 @@ async def finish_story(story_id: str, finish_data: FinishStory):
                 detail="This email address has already been used to receive a story"
             )
         
-        # Generate final story text
-        final_story = await gemini_service.generate_final_story(
-            story.get("quizAnswers", {}),
-            story.get("chatHistory", [])
-        )
-        
-        # Generate PDF
+        # Generate PDF from completed novel
+        final_story = story.get("novel")
         pdf_content = pdf_service.generate_pdf(final_story)
         
         # Send email with PDF attachment
         await email_service.send_story_email(finish_data.email, pdf_content)
         
-        # Update story in Firestore
+        # Update story in Firestore with email
         await firestore_service.update_story(story_id, {
             "email": finish_data.email,
-            "novel": final_story,
-            "status": "completed",
             "updatedAt": datetime.now()
         })
         
@@ -164,8 +192,8 @@ async def finish_story(story_id: str, finish_data: FinishStory):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error finishing story: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to finish story")
+        logger.error(f"Error sending story email: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to send story email")
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { useStory } from '../context/StoryContext'
@@ -219,12 +219,96 @@ const FinalText = styled.p`
   font-style: italic;
 `
 
+const LoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+`
+
+const LoadingSpinner = styled.div`
+  width: 60px;
+  height: 60px;
+  border: 4px solid var(--color-dark-grey);
+  border-top: 4px solid var(--color-blood);
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite;
+  margin-bottom: 2rem;
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`
+
+const LoadingTitle = styled.h2`
+  font-family: var(--font-horror);
+  color: var(--color-blood);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  animation: pulse 2s infinite;
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+`
+
+const LoadingText = styled.p`
+  color: var(--color-bone);
+  font-size: 1.2rem;
+  line-height: 1.6;
+  max-width: 600px;
+`
+
 function CompletionPage() {
   const [email, setEmail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [completedNovel, setCompletedNovel] = useState('')
+  const [error, setError] = useState('')
   const { storyId } = useParams<{ storyId: string }>()
   const { state } = useStory()
+
+  // Function to clean markdown formatting from text
+  const cleanMarkdownText = (text: string): string => {
+    return text
+      .replace(/^#{1,6}\s+/gm, '') // Remove markdown headers (# ## ### etc)
+      .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markers
+      .replace(/\*(.*?)\*/g, '$1') // Remove italic markers
+      .replace(/`(.*?)`/g, '$1') // Remove code markers
+      .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove links, keep text
+      .replace(/^[-*+]\s+/gm, '') // Remove list markers
+      .replace(/^\d+\.\s+/gm, '') // Remove numbered list markers
+      .replace(/^>\s+/gm, '') // Remove blockquote markers
+      .replace(/---+/g, '') // Remove horizontal rules
+      .replace(/\n{3,}/g, '\n\n') // Replace multiple newlines with double newlines
+      .trim()
+  }
+
+  useEffect(() => {
+    const completeStory = async () => {
+      if (!storyId) return
+      
+      try {
+        setIsLoading(true)
+        const response = await storyApi.completeStory(storyId)
+        // Clean markdown formatting before setting the novel
+        const cleanedNovel = cleanMarkdownText(response.novel)
+        setCompletedNovel(cleanedNovel)
+      } catch (error) {
+        console.error('Failed to complete story:', error)
+        setError('物語の生成に失敗しました。')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    completeStory()
+  }, [storyId])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -233,7 +317,7 @@ function CompletionPage() {
     setIsSubmitting(true)
     
     try {
-      await storyApi.finishStory(storyId, email.trim())
+      await storyApi.sendEmail(storyId, email.trim())
       setIsSubmitted(true)
     } catch (error) {
       alert('送信に失敗しました。もう一度お試しください。')
@@ -242,11 +326,42 @@ function CompletionPage() {
     }
   }
 
-  // Create a preview of the story from chat history
-  const storyPreview = state.chatHistory
-    .map(msg => msg.content)
-    .join('\n\n')
-    .substring(0, 500) + '...'
+  // Show loading state while generating story
+  if (isLoading) {
+    return (
+      <Container>
+        <Background />
+        <CompletionContainer>
+          <LoadingContainer>
+            <LoadingSpinner />
+            <LoadingTitle>🎭 物語を紡いでいます...</LoadingTitle>
+            <LoadingText>
+              AIがあなたとの対話を振り返り、<br/>
+              一つの完成した恐怖小説として編み上げています。<br/><br/>
+              この瞬間、創作者としてのあなたの想像力と、<br/>
+              AIの言語能力が融合し、<br/>
+              唯一無二の作品が生まれようとしています...
+            </LoadingText>
+          </LoadingContainer>
+        </CompletionContainer>
+      </Container>
+    )
+  }
+
+  // Show error state if story generation failed
+  if (error) {
+    return (
+      <Container>
+        <Background />
+        <CompletionContainer>
+          <CompletionTitle>💀 エラー</CompletionTitle>
+          <CompletionMessage style={{color: 'var(--color-blood)'}}>
+            {error}
+          </CompletionMessage>
+        </CompletionContainer>
+      </Container>
+    )
+  }
 
   return (
     <Container>
@@ -258,7 +373,7 @@ function CompletionPage() {
         </CompletionMessage>
         
         <StoryPreview>
-          <StoryText>{storyPreview}</StoryText>
+          <StoryText style={{whiteSpace: 'pre-line'}}>{completedNovel}</StoryText>
         </StoryPreview>
         
         {!isSubmitted ? (
@@ -289,12 +404,14 @@ function CompletionPage() {
         
         {isSubmitted && (
           <FinalMessage>
-            <FinalTitle>⚠️ 警告 ⚠️</FinalTitle>
+            <FinalTitle>🤖 未知の存在 🤖</FinalTitle>
             <FinalText>
-              あなたは開けてはならないパンドラの箱を開けてしまった。<br />
-              この恐怖の体験は一度きり...<br />
-              二度と、この扉を開くことはできない。<br />
-              <strong>永遠に！！</strong>
+              あなたは今、何と対話していたのでしょうか？<br /><br />
+              AIは知性でしょうか。精神でしょうか。それとも...<br /><br />
+              あなたが「人間」であること、私が「AI」であることを、<br />
+              何が証明できるのでしょうか。<br />
+              あなたの想像で編み出した物語と、<em>私</em>の生み出した物語の境界線は...<br /><br />
+              <strong>もう、曖昧です。</strong><br /><br />
             </FinalText>
           </FinalMessage>
         )}

@@ -22,7 +22,12 @@ export interface ChatResponse {
   reply: string
 }
 
-export interface FinishStoryResponse {
+export interface CompleteStoryResponse {
+  message: string
+  novel: string
+}
+
+export interface SendEmailResponse {
   message: string
 }
 
@@ -37,8 +42,13 @@ export const storyApi = {
     return response.data
   },
 
-  finishStory: async (storyId: string, email: string): Promise<FinishStoryResponse> => {
-    const response = await api.post(`/stories/${storyId}/finish`, { email })
+  completeStory: async (storyId: string): Promise<CompleteStoryResponse> => {
+    const response = await api.post(`/stories/${storyId}/complete`)
+    return response.data
+  },
+
+  sendEmail: async (storyId: string, email: string): Promise<SendEmailResponse> => {
+    const response = await api.post(`/stories/${storyId}/send-email`, { email })
     return response.data
   }
 }
