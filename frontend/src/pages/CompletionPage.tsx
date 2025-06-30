@@ -521,15 +521,23 @@ function CompletionPage() {
         setCurrentChunkIndex(i + 1)
         
         try {
+          console.log(`Generating chunk ${i + 1}/${chunksInfo.total_chunks}...`)
           const chunkResponse = await storyApi.generateAudioChunk(storyId, i, {
             voice: 'onyx',
             speed: 0.8
           })
 
-          // 新しいレスポンス形式では audioUrl を直接取得
-          const fullUrl = chunkResponse.audioUrl.startsWith('http') 
-            ? chunkResponse.audioUrl 
-            : `${API_BASE_URL}${chunkResponse.audioUrl}`
+          console.log(`Chunk ${i} response:`, chunkResponse)
+
+          // Blob URL または HTTP URL をそのまま使用
+          let fullUrl: string
+          if (chunkResponse.audioUrl.startsWith('blob:') || chunkResponse.audioUrl.startsWith('http')) {
+            fullUrl = chunkResponse.audioUrl
+          } else {
+            fullUrl = `${API_BASE_URL}${chunkResponse.audioUrl}`
+          }
+          
+          console.log(`Chunk ${i} final URL:`, fullUrl)
           chunkUrls.push(fullUrl)
           
           if (chunkResponse.cached) {

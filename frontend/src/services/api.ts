@@ -96,12 +96,42 @@ export const storyApi = {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to generate audio');
+        // Handle error response appropriately
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Failed to generate audio';
+        
+        try {
+          if (contentType && contentType.includes('application/json')) {
+            const errorData = await response.json();
+            errorMessage = errorData.detail || errorData.message || errorMessage;
+          } else {
+            const errorText = await response.text();
+            errorMessage = errorText || errorMessage;
+          }
+        } catch (parseError) {
+          console.warn('Failed to parse error response:', parseError);
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      const audioData: AudioGenerationResponse = await response.json();
-      return audioData;
+      // Check content type to determine how to handle response
+      const contentType = response.headers.get('content-type');
+      console.log('Response content-type:', contentType);
+      
+      if (contentType && (contentType.includes('audio/') || contentType.includes('application/octet-stream'))) {
+        // If response is binary audio data, create Blob URL
+        console.log('Received binary audio data, creating Blob URL...');
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        return { audioUrl, cached: false };
+      } else {
+        // If response is JSON with URL
+        console.log('Received JSON response with URL...');
+        const audioData: AudioGenerationResponse = await response.json();
+        return audioData;
+      }
     } catch (error) {
       console.error('Audio generation failed:', error);
       throw error;
@@ -124,12 +154,42 @@ export const storyApi = {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to generate audio chunk');
+        // Handle error response appropriately
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Failed to generate audio chunk';
+        
+        try {
+          if (contentType && contentType.includes('application/json')) {
+            const errorData = await response.json();
+            errorMessage = errorData.detail || errorData.message || errorMessage;
+          } else {
+            const errorText = await response.text();
+            errorMessage = errorText || errorMessage;
+          }
+        } catch (parseError) {
+          console.warn('Failed to parse error response:', parseError);
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      const chunkData: AudioChunkResponse = await response.json();
-      return chunkData;
+      // Check content type to determine how to handle response
+      const contentType = response.headers.get('content-type');
+      console.log('Response content-type:', contentType);
+      
+      if (contentType && (contentType.includes('audio/') || contentType.includes('application/octet-stream'))) {
+        // If response is binary audio data, create Blob URL
+        console.log('Received binary audio data, creating Blob URL...');
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        return { audioUrl, chunkId, cached: false };
+      } else {
+        // If response is JSON with URL
+        console.log('Received JSON response with URL...');
+        const chunkData: AudioChunkResponse = await response.json();
+        return chunkData;
+      }
     } catch (error) {
       console.error('Audio chunk generation failed:', error);
       throw error;
